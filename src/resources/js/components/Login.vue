@@ -12,8 +12,6 @@ const http = axios.create({
 });
 
 function login(user: string, password: string) {
-  console.log(user);
-  console.log(password);
   http.get('/sanctum/csrf-cookie').then((res) => {
       console.log(res.status)
       http.post('/login', {

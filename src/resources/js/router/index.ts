@@ -16,6 +16,14 @@ const routes = [
       const login = await import('@/components/Login.vue');
       return login;
     }
+  },
+  {
+    path: '/reserve',
+    name: 'reserve',
+    component: async () => {
+      const reserve = await import('@/components/Reserve.vue');
+      return reserve;
+    }
   }
 ];
 
