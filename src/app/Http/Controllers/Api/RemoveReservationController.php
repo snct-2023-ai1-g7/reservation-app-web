@@ -8,11 +8,8 @@ use App\Services\ReserveService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
-class ReserveController extends Controller
+class RemoveReservationController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
     public function __invoke(ReserveRequest $request, ReserveService $reserveService) : JsonResponse
     {
         $user = $request->user();
@@ -34,5 +31,5 @@ class ReserveController extends Controller
                 "message" => "Reservation succeeded."
             ]
         ]);
-    }
+    }  
 }
