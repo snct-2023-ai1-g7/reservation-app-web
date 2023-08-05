@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\MeController;
-use App\Http\Controllers\API\RemoveReservationController;
+use App\Http\Controllers\APi\RemoveReservationController;
 use App\Http\Controllers\Api\ReserveController;
 use App\Http\Controllers\Api\GetReservationsController;
 use Illuminate\Http\Request;
