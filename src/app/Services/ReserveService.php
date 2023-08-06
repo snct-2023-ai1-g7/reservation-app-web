@@ -42,7 +42,7 @@ class ReserveService
         if($reserve->room_number === $room_number) {
             $reserve->update(['room_number' => null]);
         } else {
-            throw new ReservationException("It's not allowd to change an another room's reservation.");
+            throw new ReservationException("Not allowd to change an another room's reservation.");
         }
     }
 }

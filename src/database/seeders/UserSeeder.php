@@ -20,6 +20,12 @@ class UserSeeder extends Seeder
             'room_number' => 1
         ]);
         User::create([
+            'user_id' => 'room_02',
+            'password' => 'password',
+            'user_type' => 'room',
+            'room_number' => 2 
+        ]);
+        User::create([
             'user_id' => 'admin',
             'password' => 'password',
             'user_type' => 'admin',

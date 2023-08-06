@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('reserves', function (Blueprint $table) {
-            $table->unsignedInteger('room_number')->after('end')->nullable();
+        Schema::table('tags', function (Blueprint $table) {
+            $table->string('tag_id');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('reserves', function (Blueprint $table) {
-            $table->dropColumn('room_number');
+        Schema::table('tags', function (Blueprint $table) {
+            $table->dropColumn('tag_id');
         });
     }
 };
