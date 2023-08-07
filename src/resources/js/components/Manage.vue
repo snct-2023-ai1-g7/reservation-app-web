@@ -12,8 +12,9 @@ class User {
   id: string;
   type: string;
   room_number: Number;
-  password: string
-  regenerated: boolean
+  password: string;
+  regenerated: boolean;
+  showDialog: boolean;
 
   constructor(id: string, type: string, room_number: Number) {
     this.id = id;
@@ -21,6 +22,7 @@ class User {
     this.room_number = room_number;
     this.password = "";
     this.regenerated = false;
+    this.showDialog = false;
   }
 
   regeneratePassword() {
@@ -29,13 +31,21 @@ class User {
     })
       .then(res => {
         if(res.data.message === "Password regeneration succeeded.") {
+          console.log(res.data);
           this.password = res.data.new_password;
           this.regenerated = true;
         }
       })
       .catch(err => {
-
+        console.log(err);
       });
+  }
+
+  toJson = () => {
+    return {
+      user_id: this.id,
+      password: this.password
+    }
   }
 }
 
@@ -43,10 +53,14 @@ export default {
   data(): {
     loggedIn: boolean
     users: Array<User>
+    showDialog: boolean
+    currentUser: User | null 
     } {
     return {
       loggedIn: false,
       users: [],
+      showDialog: false,
+      currentUser: null,
     };
   },
   created() {
@@ -66,6 +80,7 @@ export default {
     getUsers() {
       http.get('/api/getUsers')
         .then(res => {
+          // userの型が決定できないのでコンパイラーの警告を無視
           // @ts-ignore
           res.data.users.forEach(user => {
             // @ts-ignore
@@ -78,6 +93,19 @@ export default {
           }
         })
     },
+    onUpdateBtn(user: User | null) {
+      console.log(user);
+      this.currentUser = user;
+      this.currentUser?.regeneratePassword();
+      this.showDialog = true;
+    },
+    downloadQr(user: User | null) {
+      const canvas = document.getElementById('qr') as HTMLCanvasElement;
+      const link = document.createElement('a');
+      link.href = canvas?.toDataURL();
+      link.download = user?.id + '-qr.png';
+      link.click();
+    },
     goToTop() {
       router.push('/admin');
     }
@@ -87,6 +115,7 @@ export default {
 
 <template>
   <v-app v-if="loggedIn">
+    
     <v-app-bar color="blue">
       <v-app-bar-title>
         越後屋旅館 貸し切り風呂ページ 管理者画面
@@ -94,9 +123,9 @@ export default {
     </v-app-bar>
     <v-container style="padding-top: 10%; height: 80%;">
       <v-card >
-        <v-card title="予約する" class="text-center">
+        <v-card title="ユーザーを管理する" class="text-center">
           <v-card-subtitle class="text-wrap">
-            予約したい時間帯を選んでください。<br/>選択できない時間帯は既に他のお客様が予約されています。
+            「更新」ボタンを押すと新しいパスワードとQRコードが表示されます。
           </v-card-subtitle>
           <v-container>
             <v-data-table dense style="padding-top: 10%;">
@@ -131,11 +160,8 @@ export default {
                       (なし)
                     </td>
 
-                    <td v-if="user.regenerated">
-                      {{ `${user.password}` }}
-                    </td>
-                    <td v-else>
-                      <v-btn x-large color="blue" @click="user.regeneratePassword()">生成する</v-btn>            
+                    <td >
+                      <v-btn x-large color="blue" @click.stop="onUpdateBtn(user)">更新</v-btn>
                     </td>
                   </tr>
                 </tbody>
@@ -146,6 +172,29 @@ export default {
       <v-row justify="center" class="text-center" style="padding-top: 10%; margin-left: 50%; margin-right: 50%;">
           <v-btn x-large color="blue" @click="goToTop()">戻る</v-btn>
       </v-row>
+    <v-dialog
+      v-model="showDialog"
+      activator="parent"
+      class="text-center">
+                          <v-sheet>
+                            <h2>QRコード</h2>
+
+                            <vue-qrcode id="qr" :value='JSON.stringify(currentUser)' :options="{width: 200}"></vue-qrcode>
+
+                            <p class="my-4">
+                              パスワード: {{ `${currentUser?.password}` }} <br>
+                              QRコードを紛失すると、再度更新するまでログインできませんのでご注意ください。
+                            </p>
+                            
+                            <v-row justify="center" class="text-center" style="margin-left: 30%; margin-right: 30%;">
+                              <v-btn color="blue" block @click="downloadQr(currentUser)">QRコードを保存</v-btn> 
+                            </v-row>
+                            <v-row justify="center" class="text-center" style="padding-top: 2%; margin-left: 30%; margin-right: 30%;">
+                              <v-btn color="blue" block @click="showDialog = false">閉じる</v-btn>
+                            </v-row>
+                          </v-sheet>
+    </v-dialog>
+
     </v-container>
   </v-app>
 </template>
