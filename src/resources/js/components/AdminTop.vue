@@ -28,8 +28,8 @@ export default {
       });
       this.loggedIn = true
     },
-    goToReserve() {
-      router.push('/reserve');
+    goToManage() {
+      router.push("/manage");
     }
   }
 }
@@ -48,10 +48,10 @@ export default {
         <v-card v-else class="bg-red-lighten-1 mt-5" prepend-icon="mdi-block-helper" title="他のお客様がご利用中です" style="height: 70%; font-size: large;"></v-card>
       </v-card>
       <v-row justify="center" class="text-center" style="padding-top: 10%; margin-left: 30%; margin-right: 30%;">
-        <v-btn x-large color="blue" @click="goToReserve()">利用状況を変える</v-btn>
+        <v-btn x-large color="blue" @click="goToManage()">利用状況を変える</v-btn>
       </v-row>
       <v-row justify="center" class="text-center" style="padding-top: 2%; margin-left: 30%; margin-right: 30%;">
-        <v-btn x-large color="blue" @click="goToReserve()">ユーザーの管理</v-btn>
+        <v-btn x-large color="blue" @click="goToManage()">ユーザーの管理</v-btn>
       </v-row>
     </v-container>
   </v-app>

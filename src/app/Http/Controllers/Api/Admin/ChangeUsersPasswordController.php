@@ -21,18 +21,14 @@ class ChangeUsersPasswordController extends Controller
             $newPassword = $userService->regenerateUsersPassword($user_id);
         } catch(Exception $e) {
             return new JsonResponse([
-                'data' => [
-                    'message' => 'Failed to regenerate password.',
-                    'exception' => $e->__toString()
-                ]
+                'message' => 'Failed to regenerate password.',
+                'exception' => $e->__toString()
             ]);
         }
 
         return new JsonResponse([
-            'data' => [
-                'message' => 'Password regeneration succeeded.',
-                'new_password' => $newPassword,
-            ]
+            'message' => 'Password regeneration succeeded.',
+            'new_password' => $newPassword,
         ]);
     }
 }

@@ -14,9 +14,7 @@ class GetUsersController extends Controller
         $users = $userService->getUsers();
 
         return new JsonResponse([
-            'data' => [
-                'users' => $users
-            ]
+            'users' => $users
         ]);
     }
 }
