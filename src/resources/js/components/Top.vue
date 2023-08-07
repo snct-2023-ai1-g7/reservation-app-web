@@ -63,7 +63,7 @@ export default {
     <v-container style="padding-top: 20%; height: 80%;">
       <v-card title="現在の貸切風呂の状況" class="text-center">
         <v-card v-if="status === 'Available.'" class="bg-green-lighten-1 mt-5" prepend-icon="mdi-check-circle" title="ご利用いただけます" style="width: 80% font-size: large;"></v-card>
-        <v-card v-else-if="status === 'Unvailable.'" class="bg-red-lighten-1 mt-5" prepend-icon="mdi-block-helper" title="他のお客様がご利用中です" style="height: 70%; font-size: large;"></v-card>
+        <v-card v-else-if="status === 'Unavailable.'" class="bg-red-lighten-1 mt-5" prepend-icon="mdi-block-helper" title="他のお客様がご利用中です" style="height: 70%; font-size: large;"></v-card>
         <v-card v-else-if="status === 'Your reservation time.'" class="bg-green-lighten-1 mt-5" prepend-icon="mdi-check-circle" title="お客様がご予約されている時間です" style="width: 80% font-size: large;"></v-card>
         <v-card v-else-if="status === 'An another rooms reservation time.'" class="bg-red-lighten-1 mt-5" prepend-icon="mdi-block-helper" title="他のお客様がご予約されている時間です" style="width: 80% font-size: large;"></v-card>
       </v-card>
