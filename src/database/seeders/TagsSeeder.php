@@ -13,9 +13,9 @@ class TagsSeeder extends Seeder
     public function run(): void
     {
         Tag::create([
-            'status' => 'not using',
+            'status' => 'left',
             'user_id' => 'room_01',
-            'tag_id' => 'abc01'
+            'uid' => '04335EB2C11190'
         ]);
     }
 }
