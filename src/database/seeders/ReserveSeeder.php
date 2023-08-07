@@ -44,6 +44,11 @@ class ReserveSeeder extends Seeder
             "room_number" => null
         ]);
         Reserve::create([
+            'start' => "13:00",
+            "end" => "14:00",
+            "room_number" => null
+        ]);
+        Reserve::create([
             'start' => "14:00",
             "end" => "15:00",
             "room_number" => null

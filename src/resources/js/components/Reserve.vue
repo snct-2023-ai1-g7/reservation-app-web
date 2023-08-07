@@ -1,39 +1,70 @@
 <script lang="ts">
 import axios from 'axios';
 import router from '../router';
+import { APP_URL } from '../app';
 
 const http = axios.create({
-    baseURL: 'http://localhost',
+    baseURL: APP_URL,
     withCredentials: true,
 });
 
+class Reservation {
+  start: Date;
+  end: Date;
+  room_number: Number;
+
+  constructor(start: Date, end: Date, room_number: Number) {
+    this.start = start;
+    this.end = end;
+    this.room_number = room_number;
+  }
+}
+
 export default {
-  data() {
+  data(): {
+    loggedIn: boolean
+    currents: Array<Reservation>
+    room_number: number
+    } {
     return {
       loggedIn: false,
-      currents: [
-        {"start": "07:00", "end": "08:00", "reserved": true},
-        {"start": "08:00", "end": "09:00", "reserved": true},
-        {"start": "09:00", "end": "10:00", "reserved": false},
-        {"start": "10:00", "end": "11:00", "reserved": true},
-        {"start": "11:00", "end": "12:00", "reserved": true},
-        {"start": "12:00", "end": "13:00", "reserved": false},
-        {"start": "13:00", "end": "14:00", "reserved": true},
-      ]
+      currents: [],
+      room_number: NaN
     };
   },
   created() {
     this.checkCredential();
+    this.checkReservartions();
   },
   methods: {
     checkCredential() {
       http.get('/api/me')
+        .then(res => {
+          this.room_number = res.data.data.room_number;
+        })
         .catch(err => {
           if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
-          router.push("/login");
+            router.push("/login");
         }
       });
       this.loggedIn = true
+    },
+    checkReservartions() {
+      http.get('/api/getReserves')
+        .then(res => {
+          console.log(res.data.reservations);
+          // @ts-ignore
+          res.data.reservations.forEach(rsv => {
+            console.log(rsv);
+            // @ts-ignore
+            this.currents.push(new Reservation(rsv.start, rsv.end, rsv.room_number));
+          });
+        })
+        .catch(err => {
+          if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
+            router.push("/login"); 
+          }
+        })
     },
     goToTop() {
       router.push('/');
@@ -66,9 +97,9 @@ export default {
                 <tbody>
                   <tr v-for="current in currents">
                     <td>
-                      {{ current.start + " ~ " + current.end }}
+                      {{ `${current.start} ~ ${current.end}` }}
                     </td>
-                    <td v-if="current.reserved">
+                    <td v-if="current.room_number === null">
                       <v-checkbox color="blue"></v-checkbox>
                     </td>
                     <td v-else>

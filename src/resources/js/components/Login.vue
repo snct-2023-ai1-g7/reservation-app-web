@@ -2,28 +2,62 @@
 import {ref} from 'vue';
 import axios from 'axios';
 import router from '../router';
+import {APP_URL} from '../app';
 
 const showPassword = ref(false);
 const user = ref('');
 const password = ref('');
 const http = axios.create({
-    baseURL: 'http://localhost',
+    baseURL: APP_URL,
     withCredentials: true,
 });
 
-function login(user: string, password: string) {
-  http.get('/sanctum/csrf-cookie').then((res) => {
-      console.log(res.status)
+async function login(user: string, password: string) {
+  try {
+    await http.get('/sanctum/csrf-cookie');
+
+    const response = await http.post('login', {
+      user_id: user,
+      password: password
+    });
+
+    if (response.status === 200 && response.data.message === 'Authenticated.') {
+      const meResponse = await http.get('/api/me');
+      const user_type = meResponse.data.data.user_type;
+      switch(user_type) {
+          case 'room':
+            router.push('/');
+            break;
+          case 'admin':
+            router.push('/admin');
+            break;
+      }
+    }
+  } catch (err) {
+    console.error('Login error:', err)
+  }
+  /*
+  await http.get('/sanctum/csrf-cookie').then((res) => {
       http.post('/login', {
         user_id: user, 
         password: password
       }).then((res) => {
-        console.log(res)
         if(res.status == 200 && res.data.message == "Authenticated.") {
-            router.push('/');
+            http.get('/api/me').then((resMe) => {
+              console.log(resMe.data.user_id);
+              switch(resMe.data.user_type) {
+                case 'room':
+                  router.push('/');
+                  break;
+                case 'admin':
+                  router.push('/admin');
+                  break;
+              }
+            })
         }
     })
   });
+  */
 }
 </script>
 

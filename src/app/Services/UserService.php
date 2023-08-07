@@ -31,12 +31,12 @@ class UserService
     {
         $now = Carbon::now();
         $currentRsv = Reserve::where('start', '<=', $now->format('H:i:s'))
-                        ->where('end', '>=', $now->format('H:i:s'))
+                        // 終了時刻は現在時刻からHourを1足して分秒を0に
+                        ->where('end', '>=', $now->addHour()->setMinute(00)->setSecond(00)->format('H:i:s'))
                         ->first();
-        
         if(is_null($currentRsv->room_number)) {
-            $tags = Tag::where('status', 'using');
-            if(count($tags) == 0) {
+            $tags = Tag::where('status', 'using')->first();
+            if(is_null($tags)) {
                 return ['message' => 'Available.'];
             } else {
                 return ['message' => 'Unavailable.'];

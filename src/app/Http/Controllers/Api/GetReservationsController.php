@@ -14,9 +14,7 @@ class GetReservationsController extends Controller
         $reserves = $reserveService->getReserves();
 
         return new JsonResponse([
-            'data' => [
-                "reservations" => $reserves
-            ],
+            "reservations" => $reserves
         ]);
     }
 
