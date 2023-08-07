@@ -14,8 +14,8 @@ class CheckTagController extends Controller
         $uid = $tagRequest->uid();
         $message = $tagService->checkUsage($uid);
 
-        return new JsonResponse([
+        return new JsonResponse(
             $message
-        ]);
+        );
     }
 }
