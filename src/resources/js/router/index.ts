@@ -1,12 +1,32 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import axios from 'axios';
+import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 
-const routes = [
+const routes : Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'top',
     component: async () => {
       const top = await import('@/components/Top.vue');
       return top;
+    },
+    /*beforeEnter: (to, from, next) => {
+      next(vm => {
+        vm.$api.get('/api/me')
+          .catch(err => {
+            if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
+              next("/login");
+            }
+          })
+        next();
+      })
+    }*/
+  },
+  {
+    path: '/admin',
+    name: 'admin-top',
+    component: async () => {
+      const adminTop = await import('@/components/AdminTop.vue');
+      return adminTop;
     }
   },
   {
@@ -23,6 +43,14 @@ const routes = [
     component: async () => {
       const reserve = await import('@/components/Reserve.vue');
       return reserve;
+    }
+  },
+  {
+    path: '/manage',
+    name: 'manage',
+    component: async () => {
+      const manage = await import ('@/components/Manage.vue');
+      return manage;
     }
   }
 ];
