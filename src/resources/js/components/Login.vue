@@ -22,8 +22,37 @@ export default {
       showPassword: false,
     };
   },
+  created() {
+      this.loginByParams();
+  },
   methods: {
-   async login(user: string, password: string) {
+    async loginByParams() {
+      await http.get('/sanctum/csrf-cookie');
+      
+      if(this.$route.query.user_id === undefined || this.$route.query.password === undefined) {
+        console.log(this.$route.query); 
+        return;
+      }
+
+      const response = await http.post('login', {
+        user_id: this.$route.query.user_id,
+        password: this.$route.query.password
+      });
+
+      if (response.status === 200 && response.data.message === 'Authenticated.') {
+        const meResponse = await http.get('/api/me');
+        const user_type = meResponse.data.data.user_type;
+        switch(user_type) {
+          case 'room':
+            router.push('/');
+            break;
+          case 'admin':
+            router.push('/admin');
+            break;
+        }
+      }
+    },
+   async loginByForm(user: string, password: string) {
       try {
         await http.get('/sanctum/csrf-cookie');
 
@@ -48,35 +77,15 @@ export default {
       console.error('Login error:', err)
     }
   },
-  onDecode(result: string) {
-    this.result = result;
-  },
-  async onInit (promise: any) {
-    try {
-      await promise
-    } catch (error: any) {
-      console.log(error);
-      if (error.name === 'NotAllowedError') {
-          this.error = "ERROR: you need to grant camera access permisson"
-        } else if (error.name === 'NotFoundError') {
-          this.error = "ERROR: no camera on this device"
-        } else if (error.name === 'NotSupportedError') {
-          this.error = "ERROR: secure context required (HTTPS, localhost)"
-        } else if (error.name === 'NotReadableError') {
-          this.error = "ERROR: is the camera already in use?"
-        } else if (error.name === 'OverconstrainedError') {
-          this.error = "ERROR: installed cameras are not suitable"
-        } else if (error.name === 'StreamApiNotSupportedError') {
-          this.error = "ERROR: Stream API is not supported in this browser"
-        }
-    }
-  }
 }
 }
 </script>
 
 <template>
   <v-app>
+    <v-app-bar color="blue">
+      <v-app-bar-title>ログイン</v-app-bar-title>
+    </v-app-bar>
     <v-card width="400px" class="mx-auto mt-5">
       <v-card-title>
         <h1 class="display-1">ログイン</h1>
@@ -97,11 +106,8 @@ export default {
       </v-form>
       <v-checkbox></v-checkbox>
       <v-card-actions>
-        <v-btn @click="login(user, password)" class="info" color="primary">ログイン</v-btn>
+        <v-btn @click="loginByForm(user, password)" class="info" color="primary">ログイン</v-btn>
       </v-card-actions>
-    </v-card-text>
-    <v-card-text>
-      <qrcode-stream @decode="onDecode" @init="onInit"></qrcode-stream>
     </v-card-text>
   </v-card>
   </v-app> 
