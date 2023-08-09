@@ -77,7 +77,7 @@ export default {
 
     if (response.status === 200 && response.data.message === 'Authenticated.') {
       const meResponse = await http.get('/api/me');
-      const user_type = meResponse.data.data.user_type;
+      const user_type = meResponse.data.user_type;
       switch(user_type) {
           case 'room':
             router.push('/');

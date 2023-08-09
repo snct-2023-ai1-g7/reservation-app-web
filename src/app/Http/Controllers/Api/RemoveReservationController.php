@@ -17,19 +17,15 @@ class RemoveReservationController extends Controller
         $end = $request->end();
         
         try {
-            $reserveService->reserve($start, $end, $user->room_number);
+            $reserveService->removeReserve($start, $end, $user->room_number);
         } catch (Exception $e) {
             return new JsonResponse([
-                "data" => [
-                    "message" => $e->__toString()
-                ]
+                "message" => $e->__toString()
             ]); 
         }
 
         return new JsonResponse([
-            "data" => [
-                "message" => "Reservation succeeded."
-            ]
+            "message" => "Reservation cancelaration succeeded."
         ]);
     }  
 }

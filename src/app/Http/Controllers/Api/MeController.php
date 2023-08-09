@@ -17,11 +17,9 @@ final class MeController extends Controller
         $user = $request->user();
 
         return new JsonResponse([
-            'data' => [
-                'user_id' => $user->user_id,
-                'user_type' => $user->user_type,
-                'room_number' => $user->room_number,
-            ],
+            'user_id' => $user->user_id,
+            'user_type' => $user->user_type,
+            'room_number' => $user->room_number,
         ]);
     }
 }
