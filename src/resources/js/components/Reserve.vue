@@ -8,9 +8,12 @@ const http = axios.create({
     withCredentials: true,
 });
 
+// ~Strで終わるメンバーはフォーマット指定済みの時刻
 class Reservation {
   start: Date;
+  startStr: string;
   end: Date;
+  endStr: string;
   room_number: Number;
 
   constructor(start: string, end: string, room_number: Number) {
@@ -23,6 +26,7 @@ class Reservation {
     this.start.setMinutes(minutesStart);
     this.start.setSeconds(0);
     this.start.setMilliseconds(0);
+    this.startStr = `${this.start.getHours()}:${this.start.getMinutes()<10?'0':''}${this.start.getMinutes()}`;
 
     const endComponents = end.split(":");
     const hoursEnd = parseInt(endComponents[0]);
@@ -32,6 +36,7 @@ class Reservation {
     this.end.setMinutes(minutesEnd);
     this.end.setSeconds(0);
     this.end.setMilliseconds(0);
+    this.endStr = `${this.end.getHours()}:${this.end.getMinutes()<10?'0':''}${this.end.getMinutes()}`;
 
     this.room_number = room_number;
   }
@@ -52,7 +57,7 @@ export default {
       queue: new Array<Reservation>(), 
       confirmDialog: false,
       successDialog: false,
-      dialogMessage: ""
+      dialogMessage: "",
     };
   },
   created() {
@@ -70,6 +75,7 @@ export default {
       this.loggedIn = true
     },
     checkReservartions() {
+      this.reservations = new Array<Reservation>();
       http.get('/api/getReserves')
         .then(res => {
           console.log(res.data.reservations);
@@ -130,20 +136,25 @@ export default {
       <v-card >
         <v-card title="予約する" class="text-center">
           <v-card-subtitle class="text-wrap">
-            予約したい時間帯を選んでください。<br/>選択できない時間帯は既に他のお客様が予約されています。
+            予約したい時間帯にチェックを入れて画面下の予約ボタンを押してください。<br/>選択できない時間帯は既に他のお客様が予約されています。
           </v-card-subtitle>
+
           <v-container>
             <v-data-table dense style="padding-top: 10%;">
                 <thead>
                   <tr>
-                    <th color="blue">時間帯</th>
-                    <th color="blue">予約</th>
+                    <th color="blue">開始時間</th>
+                    <th color="blue">終了時間</th>
+                    <th color="blue">チェック</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="r in reservations">
                     <td>
-                      {{ `${r.start.getHours()}:${r.start.getMinutes()<10?'0':''}${r.start.getMinutes()} ~ ${r.end.getHours()}:${r.end.getMinutes()<10?'0':''}${r.end.getMinutes()}` }}
+                      {{ `${r.start.getHours()}:${r.start.getMinutes()<10?'0':''}${r.start.getMinutes()}` }}
+                    </td>
+                    <td>
+                      {{ `${r.end.getHours()}:${r.end.getMinutes()<10?'0':''}${r.end.getMinutes()}` }}
                     </td>
                     <td v-if="r.room_number === null">
                       <v-checkbox color="blue" v-on:change="changedCheckbox(r)"></v-checkbox>

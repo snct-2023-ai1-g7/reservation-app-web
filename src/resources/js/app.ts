@@ -8,6 +8,7 @@ import router from './router';
 import axios from 'axios';
 import VueQrcode from '@chenfengyuan/vue-qrcode';
 import { VueQrcodeReader } from 'vue-qrcode-reader';
+import { VDataTable } from 'vuetify/lib/labs/components.mjs';
 
 const app = createApp(App);
 const vuetify = createVuetify();
@@ -21,6 +22,7 @@ const apiClient = axios.create({
 app.config.globalProperties.$api = apiClient;
 
 app.component(VueQrcode.name, VueQrcode);
+app.component(VDataTable.name, VDataTable);
 app.use(VueQrcodeReader)
 app.use(router);
 app.use(vuetify);
