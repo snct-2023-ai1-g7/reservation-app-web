@@ -13,18 +13,36 @@ export default {
   data(): {
     loggedIn: boolean
     reservations: Array<Reservation>
-    queue: Array<Reservation>
     confirmDialog: boolean
     successDialog: boolean
     dialogMessage: string
+    headers: any
+    roomNumber: Number
+    reservationCancel: Reservation | null
     } {
     return {
       loggedIn: false,
       reservations: new Array<Reservation>(),
-      queue: new Array<Reservation>(), 
       confirmDialog: false,
       successDialog: false,
       dialogMessage: "",
+      headers: [
+        {
+          text: '開始',
+          value: 'start'
+        },
+        {
+          text: '終了',
+          value: 'end'
+        },
+        {
+          text: 'キャンセル',
+          value: 'cancel',
+          sortable: false
+        }
+      ],
+      roomNumber: NaN,
+      reservationCancel: null
     };
   },
   created() {
@@ -34,6 +52,9 @@ export default {
   methods: {
     checkCredential() {
       http.get('/api/me')
+        .then(res => {
+          this.roomNumber = res.data.room_number
+        })
         .catch(err => {
           if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
             router.push("/login");
@@ -45,11 +66,13 @@ export default {
       this.reservations = new Array<Reservation>();
       http.get('/api/getReserves')
         .then(res => {
-          console.log(res.data.reservations);
+          console.log(res.data)
           // @ts-ignore
           res.data.reservations.forEach(rsv => {
-            // @ts-ignore
-            this.reservations.push(new Reservation(rsv.start, rsv.end, rsv.room_number));
+            if(rsv.room_number === this.roomNumber) {
+              // @ts-ignore
+              this.reservations.push(new Reservation(rsv.start, rsv.end, rsv.room_number));
+            }
           });
         })
         .catch(err => {
@@ -58,19 +81,12 @@ export default {
           }
         })
     },
-    changedCheckbox(reservation: Reservation) {
-      if(this.queue.includes(reservation)) {
-        this.queue.splice(this.queue.indexOf(reservation), 1);
-      } else {
-        this.queue.push(reservation);
-      }
-      console.log(this.queue);
-    },
-    Reserve() {
-      this.queue.forEach(q => {
-        http.post('/api/reserve', {
-          start: `${q.start.getHours()}:${q.start.getMinutes()<10?'0':''}${q.start.getMinutes()}`,
-          end: `${q.end.getHours()}:${q.end.getMinutes()<10?'0':''}${q.end.getMinutes()}`
+    CancelReservation() {
+      if(this.reservationCancel == null) return;
+
+        http.post('/api/removeReserve', {
+          start: this.reservationCancel.startStr,
+          end: this.reservationCancel.endStr
         })
         .then(res => {
           if (res.status === 200) {
@@ -81,8 +97,6 @@ export default {
 
         });
         this.successDialog = true;
-      });
-      
     },
     GoToTop() {
       router.push('/');
@@ -100,18 +114,17 @@ export default {
     </v-app-bar>
     <v-container style="padding-top: 20%; height: 80%;">
       <v-card >
-        <v-card title="予約する" class="text-center">
+        <v-card title="予約一覧" class="text-center">
           <v-card-subtitle class="text-wrap">
-            予約したい時間帯にチェックを入れて画面下の予約ボタンを押してください。<br/>選択できない時間帯は既に他のお客様が予約されています。
+            お客様がご予約されている時間の一覧です。<br/>キャンセルボタンを押すと予約をキャンセルします。
           </v-card-subtitle>
-
           <v-container>
             <v-data-table dense style="padding-top: 10%;">
                 <thead>
                   <tr>
-                    <th color="blue">開始時間</th>
-                    <th color="blue">終了時間</th>
-                    <th color="blue">チェック</th>
+                    <th color="blue">開始</th>
+                    <th color="blue">終了</th>
+                    <th>削除</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -122,11 +135,8 @@ export default {
                     <td>
                       {{ r.endStr }}
                     </td>
-                    <td v-if="r.room_number === null">
-                      <v-checkbox color="blue" v-on:change="changedCheckbox(r)"></v-checkbox>
-                    </td>
-                    <td v-else>
-                      <v-checkbox color="gray" v-bind:disabled="true"></v-checkbox>
+                    <td>
+                      <v-btn x-large color="red" @click="reservationCancel = r; confirmDialog = true;">キャンセル</v-btn>
                     </td>
                   </tr>
                 </tbody>
@@ -134,9 +144,6 @@ export default {
           </v-container>
         </v-card>
       </v-card>
-      <v-row justify="center" class="text-center" v-bind:disabled="queue.length > 0" style="padding-top: 5%; margin-left: 50%; margin-right: 50%;">
-          <v-btn x-large id="dialog-popup" color="blue">予約</v-btn>
-      </v-row>
       <v-row justify="center" class="text-center" style="padding-top: 3%; margin-left: 50%; margin-right: 50%;">
           <v-btn x-large color="blue" @click="GoToTop()">戻る</v-btn>
       </v-row>
@@ -151,15 +158,15 @@ export default {
         <h2>確認</h2>
 
         <p class="my-4">
-          以下の時間で予約します。よろしいですか?
+          {{ reservationCancel?.startStr }} から {{ reservationCancel?.endStr }} の予約をキャンセルしてもよろしいですか?
         </p>
-
-        <li v-for="(q, index) in queue" class="my-4">
-          {{ `${q.start.getHours()}:${q.start.getMinutes()<10?'0':''}${q.start.getMinutes()} から ${q.end.getHours()}:${q.end.getMinutes()<10?'0':''}${q.end.getMinutes()}` }}
-        </li>
-
-        <v-btn color="green" @click="Reserve()" style="margin: 5%;">予約</v-btn>
-        <v-btn color="red" @click="confirmDialog = false" style="margin: 5%;">キャンセル</v-btn>
+       
+      <v-row justify="center" class="text-center" style="padding-top: 5%;">
+        <v-btn color="red" @click="CancelReservation()">キャンセル</v-btn>
+      </v-row>
+      <v-row justify="center" class="text-center" style="padding-top: 3%;">
+        <v-btn color="green" @click="confirmDialog = false">戻る</v-btn>
+      </v-row>
       </v-sheet>
     </v-dialog>
 
@@ -167,13 +174,13 @@ export default {
       v-model="successDialog"
       class="text-center">
         <v-sheet>
-          <h2>予約完了</h2>
+          <h2>キャンセル完了</h2>
           <p class="my-4">
-            予約が完了しました。
+            キャンセルしました。
           </p>
                             
           <v-row justify="center" class="text-center" style="padding-top: 2%; margin-left: 30%; margin-right: 30%;">
-            <v-btn color="blue" block @click="successDialog = false; confirmDialog = false; checkReservartions();">閉じる</v-btn>
+            <v-btn color="blue" block @click="checkReservartions(); successDialog = false; confirmDialog = false;">閉じる</v-btn>
           </v-row>
         </v-sheet>
   </v-dialog>

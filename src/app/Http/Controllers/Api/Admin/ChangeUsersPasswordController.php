@@ -4,21 +4,19 @@ namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChangePasswordRequest;
-use App\Services\UserService;
+use App\Services\AdminService;
 use Exception;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ChangeUsersPasswordController extends Controller
 {
-    public function __invoke(ChangePasswordRequest $request, UserService $userService) : JsonResponse 
+    public function __invoke(ChangePasswordRequest $request, AdminService $adminService) : JsonResponse 
     {
         $user_id = $request->only(['user_id'])['user_id'];
         $newPassword = '';
 
         try {
-            $newPassword = $userService->regenerateUsersPassword($user_id);
+            $newPassword = $adminService->regenerateUsersPassword($user_id);
         } catch(Exception $e) {
             return new JsonResponse([
                 'message' => 'Failed to regenerate password.',

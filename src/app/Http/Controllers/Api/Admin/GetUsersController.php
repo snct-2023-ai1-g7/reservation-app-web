@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\UserService;
+use App\Services\AdminService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class GetUsersController extends Controller
 {
-    public function __invoke(UserService $userService) : JsonResponse 
+    public function __invoke(AdminService $adminService) : JsonResponse 
     {
-        $users = $userService->getUsers();
+        $users = $adminService->getUsers();
 
         return new JsonResponse([
             'users' => $users

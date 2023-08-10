@@ -26,7 +26,7 @@ class User {
   }
 
   regeneratePassword() {
-    http.post("/api/changePassword", {
+    http.post("/api/admin/changePassword", {
       user_id: this.id
     })
       .then(res => {
@@ -80,7 +80,7 @@ export default {
       this.loggedIn = true
     },
     getUsers() {
-      http.get('/api/getUsers')
+      http.get('/api/admin/getUsers')
         .then(res => {
           // userの型が決定できないのでコンパイラーの警告を無視
           // @ts-ignore

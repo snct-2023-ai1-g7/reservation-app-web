@@ -17,5 +17,10 @@ class TagsSeeder extends Seeder
             'user_id' => 'room_01',
             'uid' => '4519417819317144'
         ]);
+        Tag::create([
+            'status' => 'left',
+            'user_id' => 'room_02',
+            'uid' => '48013817819317144'
+        ]);
     }
 }

@@ -46,6 +46,14 @@ const routes : Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/reservelist',
+    name: 'reservelist',
+    component: async () => {
+      const reserveList = await import('@/components/ReserveList.vue');
+      return reserveList;
+    }
+  },
+  {
     path: '/manage',
     name: 'manage',
     component: async () => {
