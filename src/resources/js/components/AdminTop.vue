@@ -16,6 +16,7 @@ export default {
       status: '',
       confirmDialog: false,
       succeedDialog: false,
+      failedDialog: false,
       targetRoom: NaN
     };
   },
@@ -73,6 +74,7 @@ export default {
           if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
             router.push("/login");
           }
+          
         });
       } else if (this.status == "Available."){
         http.post('/api/admin/updateStatus', {
@@ -159,7 +161,21 @@ export default {
             <v-btn color="blue" block @click="succeedDialog = false; confirmDialog = false; checkStatus();">閉じる</v-btn>
           </v-row>
         </v-sheet>
-  </v-dialog> 
+    </v-dialog> 
+
+    <v-dialog
+      v-model="failedDialog"
+      class="text-center">
+        <v-sheet>
+          <p class="my-4">
+            更新できませんでした。<br>部屋番号が間違っている可能性があります。お部屋の番号をご確認の上再度お試しください。
+          </p>
+                            
+          <v-row justify="center" class="text-center" style="padding-top: 2%; margin-left: 30%; margin-right: 30%;">
+            <v-btn color="blue" block @click="failedDialog = false; confirmDialog = false; checkStatus();">閉じる</v-btn>
+          </v-row>
+        </v-sheet>
+    </v-dialog>
   </v-app>
 </template>
 
