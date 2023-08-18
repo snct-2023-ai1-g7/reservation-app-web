@@ -183,8 +183,9 @@ export default {
           <h2>QRコード</h2>
           <vue-qrcode id="qr" :value="`${appUrl}/login?user_id=${currentUser?.id}&password=${currentUser?.password}`" :options="{width: 200}"></vue-qrcode>
           <p class="my-4">
+            ユーザー名: {{ `${currentUser?.id}` }} <br>
             パスワード: {{ `${currentUser?.password}` }} <br>
-            QRコードを紛失すると、再度更新するまでログインできませんのでご注意ください。
+            ユーザー名、パスワード、QRコードを紛失すると、再度更新するまでログインできませんのでご注意ください。
           </p>
                             
           <v-row justify="center" class="text-center" style="margin-left: 30%; margin-right: 30%;">
