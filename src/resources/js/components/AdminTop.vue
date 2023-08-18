@@ -74,7 +74,7 @@ export default {
           if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
             router.push("/login");
           }
-          
+          this.failedDialog = true; 
         });
       } else if (this.status == "Available."){
         http.post('/api/admin/updateStatus', {
@@ -92,6 +92,7 @@ export default {
           if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
             router.push("/login");
           }
+          this.failedDialog = true;
         });
       }
     },
