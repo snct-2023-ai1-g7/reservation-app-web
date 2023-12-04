@@ -78,3 +78,10 @@ http://localhost
 
 - Base image
   - [axllent/mailpit](https://hub.docker.com/r/axllent/mailpit)
+
+### システム運用時の注意点
+- LAN内の場合は以下のファイルの値をホストのIPアドレスに変更(localhostの場合はlocalhost)
+  - `vite.config.js` -> `hmr`
+  - `app.ts` -> `APP_URL`
+  - `.env` -> `APP_URL, SANCTUM_STATEFUL_DOMAINS`
+　
